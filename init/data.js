@@ -12,7 +12,7 @@ const sampleListings = [
   {
     title: "Miami Art Deco Luxury Apartment",
     description: "A bright, high-floor premium suite inspired completely by Miami's iconic neon and Art Deco retro architecture.",
-    image: { filename: "listingimage", url: "https://images.unsplash.com/photo-1502672086835-433b611d02ca?auto=format&fit=crop&w=1200&q=80" },
+    image: { filename: "listingimage", url: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=80" },
     price: 1900,
     location: "Miami",
     country: "United States",
@@ -224,7 +224,7 @@ const sampleListings = [
   {
     title: "Tuscan Vineyard Homestead",
     description: "Wake up to fresh farm animals and endless rows of wine grapes in this gorgeous masonry complex.",
-    image: { filename: "listingimage", url: "https://images.unsplash.com/photo-1523531294919-4bcd7c65e215?auto=format&fit=crop&w=1200&q=80" },
+    image: { filename: "listingimage", url: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80" },
     price: 1250,
     location: "Siena",
     country: "Italy",

@@ -1,0 +1,299 @@
+<% layout("/layouts/boilerplate") %>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_red.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<div class="row justify-content-center my-5">
+  <div class="col-lg-8 col-md-10">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+      <img src="<%= listing.image?.url || 'https://placehold.co/900x600?text=StayNest' %>" class="card-img-top w-100" alt="<%= listing.title %>" style="max-height: 480px; object-fit: cover;">
+      <div class="card-body p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h2 class="fw-bold mb-0"><%= listing.title %></h2>
+          <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-bold"><%= listing.category %></span>
+        </div>
+
+        <p class="text-muted mb-4">
+          <i class="fa-solid fa-location-dot me-2 text-danger"></i><%= listing.location %>, <%= listing.country %>
+        </p>
+
+        <div class="bg-light rounded-3 p-3 mb-4">
+          <p class="text-secondary small mb-1">Hosted by</p>
+          <p class="fw-semibold mb-0">
+            <i class="fa-solid fa-circle-user me-2"></i><%= listing.owner?.email?.split("@")[0] || "System Administrator" %>
+          </p>
+        </div>
+
+        <h5 class="fw-bold mb-3">About this space</h5>
+        <p class="text-secondary mb-4 lh-base" style="white-space: pre-line;"><%= listing.description %></p>
+
+        <div class="border-top pt-4">
+          <div class="mb-4">
+            <span class="fs-4 fw-bold text-danger">₹<%= listing.price.toLocaleString("en-IN") %></span>
+            <span class="text-secondary">/ night</span>
+          </div>
+
+          <% const isOwner = typeof currUser !== 'undefined' && currUser && listing.owner && listing.owner._id.toString() === currUser._id.toString(); %>
+
+          <% if (typeof currUser !== 'undefined' && currUser && !isOwner) { %>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-secondary">Check-In</label>
+              <input type="text" id="checkin-date" class="form-control text-center" placeholder="Select Date" readonly>
+              <input type="hidden" id="checkIn">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-secondary">Check-Out</label>
+              <input type="text" id="checkout-date" class="form-control text-center" placeholder="Select Date" readonly>
+              <input type="hidden" id="checkOut">
+            </div>
+          </div>
+
+          <div id="invoice-box" class="bg-light rounded-4 p-3 mb-4 d-none">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-secondary">Nights</span>
+              <span class="fw-semibold" id="breakdown-nights">0</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-secondary">Price</span>
+              <span>₹<span id="base-price">0</span></span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <span class="fw-bold">Total</span>
+              <span class="fw-bold text-danger fs-5">₹<span id="total-price">0</span></span>
+            </div>
+          </div>
+          <% } %>
+
+          <div class="d-flex justify-content-end">
+            <% if (typeof currUser === 'undefined' || !currUser) { %>
+            <a href="/login" class="btn btn-outline-danger btn-lg rounded-3 fw-bold">Login to Book</a>
+            <% } else if (!isOwner) { %>
+            <button id="book-now-btn" 
+                    class="btn btn-danger btn-lg px-5 rounded-3 fw-bold" 
+                    data-listing-id="<%= listing._id %>"
+                    data-listing-price="<%= listing.price %>"
+                    data-razorpay-key="<%= typeof razorpayKeyId !== 'undefined' ? razorpayKeyId : '' %>" 
+                    disabled>
+              <i class="fa-solid fa-bolt me-2"></i>Select Dates
+            </button>
+            <% } %>
+          </div>
+        </div>
+
+        <% if (typeof currUser !== 'undefined' && currUser && isOwner) { %>
+        <div class="d-flex gap-3 border-top pt-4 mt-4">
+          <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark rounded-3 fw-bold px-4">
+            <i class="fa-solid fa-pen-to-square me-2"></i>Edit Listing
+          </a>
+          <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+            <button class="btn btn-outline-danger rounded-3 fw-bold px-4">
+              <i class="fa-solid fa-trash me-2"></i>Delete Listing
+            </button>
+          </form>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5">
+  <% if (typeof currUser !== 'undefined' && currUser) { %>
+  <h4 class="fw-bold mb-4">Leave a Review</h4>
+  <form method="POST" action="/listings/<%= listing._id %>/reviews" class="needs-validation mb-4" novalidate>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Rating</label>
+      <fieldset class="starability-slot">
+        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
+        
+        <input type="radio" id="rate1" name="review[rating]" value="1">
+        <label for="rate1">1 star</label>
+        
+        <input type="radio" id="rate2" name="review[rating]" value="2">
+        <label for="rate2">2 stars</label>
+        
+        <input type="radio" id="rate3" name="review[rating]" value="3">
+        <label for="rate3">3 stars</label>
+        
+        <input type="radio" id="rate4" name="review[rating]" value="4">
+        <label for="rate4">4 stars</label>
+        
+        <input type="radio" id="rate5" name="review[rating]" value="5">
+        <label for="rate5">5 stars</label>
+      </fieldset>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Comment</label>
+      <textarea name="review[comment]" rows="4" class="form-control rounded-3" placeholder="Share your experience..." required></textarea>
+      <div class="invalid-feedback">Please write a comment.</div>
+    </div>
+
+    <button class="btn btn-danger rounded-3 fw-bold px-4">Submit Review</button>
+  </form>
+  <hr>
+  <% } %>
+
+  <h4 class="fw-bold mb-4">Reviews</h4>
+  <% if (listing.reviews?.length) { %>
+  <div class="row g-4">
+    <% listing.reviews.forEach(review => { %>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+        <div class="d-flex align-items-center mb-3">
+          <img src="<%= review.author?.profileImage?.url || 'https://placehold.co/60x60?text=User' %>" class="rounded-circle me-3" style="width: 55px; height: 55px; object-fit: cover;">
+          <div>
+            <h6 class="fw-bold mb-1"><%= review.author?.email?.split("@")[0] || "User" %></h6>
+            <div class="text-warning">
+              <% for (let i = 1; i <= 5; i++) { %>
+              <i class="<%= i <= review.rating ? 'fa-solid fa-star' : 'fa-regular fa-star' %>"></i>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <p class="text-secondary"><%= review.comment %></p>
+        <% if (typeof currUser !== 'undefined' && currUser && review.author && review.author._id.toString() === currUser._id.toString()) { %>
+        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <p class="text-secondary">No reviews yet.</p>
+  <% } %>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkInInput = document.getElementById("checkIn");
+    const checkOutInput = document.getElementById("checkOut");
+    const bookBtn = document.getElementById("book-now-btn");
+
+    function calculateBooking() {
+      if (!checkInInput.value || !checkOutInput.value || !bookBtn) return;
+      const start = new Date(checkInInput.value);
+      const end = new Date(checkOutInput.value);
+      const listingPrice = Number(bookBtn.dataset.listingPrice);
+
+      if (end > start) {
+        const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        const total = listingPrice * nights;
+
+        document.getElementById("breakdown-nights").innerText = nights;
+        document.getElementById("base-price").innerText = total.toLocaleString("en-IN");
+        document.getElementById("total-price").innerText = total.toLocaleString("en-IN");
+        document.getElementById("invoice-box").classList.remove("d-none");
+
+        bookBtn.disabled = false;
+        bookBtn.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Book Now';
+      } else {
+        if(bookBtn) {
+          bookBtn.disabled = true;
+          bookBtn.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Select Dates';
+        }
+        document.getElementById("invoice-box").classList.add("d-none");
+      }
+    }
+
+    if (typeof flatpickr !== "undefined") {
+      const checkinPicker = flatpickr("#checkin-date", {
+        minDate: "today",
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates) {
+          if (selectedDates.length) {
+            const localDate = new Date(selectedDates[0].getTime() - selectedDates[0].getTimezoneOffset() * 60000);
+            checkInInput.value = localDate.toISOString().split('T')[0];
+            
+            const nextDay = new Date(selectedDates[0]);
+            nextDay.setDate(nextDay.getDate() + 1);
+            if (typeof checkoutPicker !== "undefined") {
+              checkoutPicker.set("minDate", nextDay);
+            }
+            calculateBooking();
+          }
+        }
+      });
+
+      const checkoutPicker = flatpickr("#checkout-date", {
+        minDate: "today",
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates) {
+          if (selectedDates.length) {
+            const localDate = new Date(selectedDates[0].getTime() - selectedDates[0].getTimezoneOffset() * 60000);
+            checkOutInput.value = localDate.toISOString().split('T')[0];
+            calculateBooking();
+          }
+        }
+      });
+    }
+
+    if (bookBtn) {
+      bookBtn.addEventListener("click", async () => {
+        const listingId = bookBtn.dataset.listingId;
+        bookBtn.disabled = true;
+        bookBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        
+        try {
+          const response = await fetch(`/orders/create/${listingId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              checkIn: checkInInput.value,
+              checkOut: checkOutInput.value,
+              nights: document.getElementById("breakdown-nights").innerText
+            })
+          });
+
+          const data = await response.json();
+          if (!data.success) {
+            alert(data.error);
+            calculateBooking();
+            return;
+          }
+
+          const options = {
+            key: bookBtn.dataset.razorpayKey,
+            amount: data.order.amount,
+            currency: "INR",
+            name: "StayNest",
+            description: "Booking Accommodation Payment",
+            order_id: data.order.id,
+            handler: async function(response) {
+              const verify = await fetch("/orders/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(response)
+              });
+              const result = await verify.json();
+              if (result.status === "success") {
+                window.location.href = "/orders/myorders";
+              } else {
+                alert("Payment verification failed.");
+                window.location.reload();
+              }
+            },
+            modal: {
+              ondismiss: function() {
+                calculateBooking();
+              }
+            }
+          };
+
+          const razorpayInstance = new Razorpay(options);
+          razorpayInstance.open();
+        } catch (err) {
+          console.error(err);
+          alert("An error occurred during order generation.");
+          calculateBooking();
+        }
+      });
+    }
+  });
+</script>

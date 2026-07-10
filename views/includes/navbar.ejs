@@ -1,0 +1,142 @@
+<style>
+  .navbar {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .navbar-brand {
+    font-size: 2rem;
+    color: #ff385c !important;
+    transition: transform 0.3s ease;
+  }
+
+  .navbar-brand:hover {
+    transform: rotate(-10deg) scale(1.08);
+  }
+
+  .nav-link {
+    color: #222 !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    border-radius: 10px;
+    padding: 0.55rem 0.9rem !important;
+  }
+
+  .nav-link:hover {
+    color: #ff385c !important;
+    background: rgba(255, 56, 92, 0.08);
+  }
+
+  .search-form {
+    max-width: 430px;
+    width: 100%;
+  }
+
+  .search-inp {
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    padding: 0.65rem 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .search-inp:focus {
+    border-color: #ff385c;
+    box-shadow: 0 0 0 0.18rem rgba(255, 56, 92, 0.18);
+  }
+
+  .search-btn {
+    background: #ff385c;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.3rem;
+    font-weight: 600;
+  }
+
+  .search-btn:hover {
+    background: #e61e4d;
+    color: white;
+  }
+
+  .nav-profile-img {
+    width: 26px;
+    height: 26px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1.5px solid #ff385c;
+  }
+
+  @media (max-width: 991px) {
+    .search-form {
+      margin: 1rem 0;
+    }
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg sticky-top border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="fa-regular fa-compass"></i>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/listings">Explore</a>
+        </li>
+      </ul>
+
+      <% if (typeof pageUrl !== 'undefined' && pageUrl && pageUrl.startsWith("/listings") && pageUrl !== "/listings/new") { %>
+      <form class="d-flex search-form mx-lg-auto my-3 my-lg-0" action="/listings" method="GET">
+        <input class="form-control search-inp me-2" type="search" name="search" placeholder="Search destinations...">
+        <button class="btn search-btn">
+          <i class="fa-solid fa-magnifying-glass me-1"></i>
+          Search
+        </button>
+      </form>
+      <% } else { %>
+      <div class="mx-lg-auto"></div>
+      <% } %>
+
+      <ul class="navbar-nav ms-lg-4 align-items-lg-center">
+        <% if (typeof currUser !== 'undefined' && currUser) { %>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/profile">
+            <img src="<%= currUser.profileImage?.url || 'https://placehold.co/80x80?text=User' %>" class="nav-profile-img" alt="Profile">
+            <span>Profile</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/orders/myorders">
+            <i class="fa-solid fa-bag-shopping me-1 text-danger"></i>
+            My Orders
+          </a>
+        </li>
+        <% } %>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/listings/new">StayNest your home</a>
+        </li>
+
+        <% if (typeof currUser === 'undefined' || !currUser) { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/signup"><strong>Sign Up</strong></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/login"><strong>Log In</strong></a>
+        </li>
+        <% } else { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout"><strong>Log Out</strong></a>
+        </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

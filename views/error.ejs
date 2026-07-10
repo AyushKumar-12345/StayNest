@@ -1,0 +1,28 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row justify-content-center align-items-center my-5 py-md-4">
+  <div class="col-md-6 text-center">
+    <div class="alert alert-danger rounded-4 p-5 shadow-sm border-0" role="alert">
+      <div class="mb-4 text-danger">
+        <i class="fa-solid fa-triangle-exclamation fa-4x"></i>
+      </div>
+
+      <h2 class="alert-heading fw-bold mb-3">Something Went Wrong</h2>
+      
+      <p class="fs-6 text-secondary mb-4">
+        <%= typeof message !== 'undefined' && message ? message : "An unexpected error occurred on the platform." %>
+      </p>
+
+      <hr class="my-4">
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <a href="/listings" class="btn btn-danger btn-lg px-4 rounded-3 fw-bold">
+          <i class="fa-solid fa-house-chimney text-white me-2"></i>Back to Stays
+        </a>
+        <a href="/" class="btn btn-outline-dark btn-lg px-4 rounded-3 fw-bold">
+          <i class="fa-solid fa-house me-2"></i>Home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

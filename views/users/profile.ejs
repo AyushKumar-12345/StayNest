@@ -1,0 +1,44 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-secondary small fw-bold text-uppercase">User Account</span>
+          <a href="/listings" class="btn btn-link text-decoration-none text-secondary p-0 fw-bold small">
+            <i class="fa-solid fa-arrow-left me-1"></i>Back to Stays
+          </a>
+        </div>
+
+        <div class="text-center">
+          <img src="<%= typeof user !== 'undefined' && user.profileImage?.url ? user.profileImage.url : 'https://placehold.co/150x150?text=User' %>" class="rounded-circle border border-3 border-danger shadow-sm mb-4" style="width: 140px; height: 140px; object-fit: cover;" alt="Profile Image">
+          
+          <h3 class="fw-bold mb-1">
+            <%= typeof user !== 'undefined' && user.email ? user.email.split("@")[0] : "User" %>
+          </h3>
+          
+          <p class="text-muted small mb-4">
+            <i class="fa-regular fa-envelope me-2"></i><%= typeof user !== 'undefined' && user.email ? user.email : "" %>
+          </p>
+        </div>
+
+        <div class="bg-light p-3 rounded-3 mb-4">
+          <form action="/profile/update-avatar" method="POST" enctype="multipart/form-data">
+            <label for="profileImage" class="form-label small fw-bold text-secondary">Change Profile Picture</label>
+            <div class="input-group">
+              <input type="file" class="form-control" id="profileImage" name="profileImage" accept="image/*" required>
+              <button class="btn btn-danger fw-bold" type="submit">Upload</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="d-grid gap-2">
+          <a href="/orders/myorders" class="btn btn-outline-dark fw-bold rounded-3">
+            <i class="fa-solid fa-bag-shopping me-2"></i>View My Bookings
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

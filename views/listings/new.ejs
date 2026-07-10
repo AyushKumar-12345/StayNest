@@ -1,0 +1,80 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row justify-content-center my-5">
+  <div class="col-lg-8 col-md-10">
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-body p-4 p-md-5">
+        <h2 class="text-center fw-bold mb-4">
+          <i class="fa-solid fa-house-circle-check text-danger me-2"></i>Create a New Listing
+        </h2>
+
+        <form method="POST" action="/listings" enctype="multipart/form-data" class="needs-validation" novalidate>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Title</label>
+            <input name="listing[title]" type="text" class="form-control" placeholder="e.g., Cozy Beachside Cottage" required>
+            <div class="invalid-feedback">Please enter a listing title.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Description</label>
+            <textarea name="listing[description]" rows="5" class="form-control" placeholder="Describe your property..." required></textarea>
+            <div class="invalid-feedback">Please provide a description.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Upload Listing Image</label>
+            <input name="listing[image]" type="file" class="form-control" accept="image/*" required>
+            <div class="invalid-feedback">Please upload an image.</div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold">Price (₹ / Night)</label>
+              <input name="listing[price]" type="number" min="0" class="form-control" placeholder="e.g., 3500" required>
+              <div class="invalid-feedback">Please enter a valid price.</div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold">Category</label>
+              <select name="listing[category]" class="form-select" required>
+                <option value="" disabled selected>Select an option...</option>
+                <option value="Trending">Trending</option>
+                <option value="Rooms">Rooms</option>
+                <option value="Cities">Cities</option>
+                <option value="Mountains">Mountains</option>
+                <option value="Castles">Castles</option>
+                <option value="Pools">Pools</option>
+                <option value="Camping">Camping</option>
+                <option value="Farms">Farms</option>
+                <option value="Arctic">Arctic</option>
+                <option value="Domes">Domes</option>
+                <option value="Boats">Boats</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid category.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold">Location</label>
+              <input name="listing[location]" type="text" class="form-control" placeholder="e.g., Candolim, Goa" required>
+              <div class="invalid-feedback">Please enter a location.</div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold">Country</label>
+              <input name="listing[country]" type="text" class="form-control" placeholder="e.g., India" required>
+              <div class="invalid-feedback">Please enter a country.</div>
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-danger btn-lg rounded-3 fw-bold py-2">
+              <i class="fa-solid fa-plus me-2"></i>Publish Listing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

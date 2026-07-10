@@ -1,0 +1,81 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container py-5">
+    <div class="row align-items-center justify-content-center my-lg-5" style="min-height: 65vh;">
+        <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start">
+            <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2 mb-3 fw-bold">
+                Welcome to StayNest
+            </span>
+
+            <h1 class="display-4 fw-extrabold mb-4 lh-sm">
+                Find Your Perfect Stay, <br>
+                <span class="text-danger">Anywhere in the World.</span>
+            </h1>
+
+            <p class="lead text-secondary mb-4 fs-5">
+                Discover handpicked homes, luxury villas, cozy apartments, mountain retreats, beach escapes, and unique stays around the globe.
+            </p>
+
+            <div class="d-flex flex-row justify-content-center justify-content-lg-start gap-3">
+                <a href="/listings" class="btn btn-danger btn-lg px-4 py-2 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-compass me-2"></i> Explore Stays
+                </a>
+
+                <% if (typeof currUser === 'undefined' || !currUser) { %>
+                    <a href="/signup" class="btn btn-outline-dark btn-lg px-4 py-2 rounded-3 d-inline-flex align-items-center justify-content-center">
+                        Join Now
+                    </a>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="col-lg-6 text-center">
+            <img
+                src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80"
+                class="img-fluid rounded-5 shadow-lg w-100"
+                alt="StayNest Hero"
+                style="max-height: 460px; object-fit: cover;"
+            >
+        </div>
+    </div>
+</div>
+
+<section class="py-5 border-top border-light-subtle container">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="mb-3 text-danger">
+                    <i class="fa-solid fa-house fa-2x"></i>
+                </div>
+                <h4 class="fw-bold">Premium Homes</h4>
+                <p class="text-secondary mb-0">
+                    Explore beautiful properties carefully selected for every traveler.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="mb-3 text-danger">
+                    <i class="fa-solid fa-location-dot fa-2x"></i>
+                </div>
+                <h4 class="fw-bold">Worldwide Locations</h4>
+                <p class="text-secondary mb-0">
+                    Discover amazing stays from cities to mountains and beaches.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="mb-3 text-danger">
+                    <i class="fa-solid fa-star fa-2x"></i>
+                </div>
+                <h4 class="fw-bold">Trusted Reviews</h4>
+                <p class="text-secondary mb-0">
+                    Read genuine reviews from real travelers before booking.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

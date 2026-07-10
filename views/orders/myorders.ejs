@@ -1,0 +1,99 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0">
+      <i class="fa-solid fa-clock-history text-danger me-2"></i>My Bookings & Orders
+    </h2>
+    <a href="/listings" class="btn btn-outline-dark px-4 rounded-pill fw-bold btn-sm shadow-sm">
+      <i class="fa-solid fa-arrow-left me-2"></i>Back to Stays
+    </a>
+  </div>
+
+  <hr class="mb-4">
+
+  <% if (typeof orders !== 'undefined' && orders?.length) { %>
+  <div class="row g-4">
+    <% orders.forEach(order => { %>
+      <% if (order.listing) { %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+          <img src="<%= order.listing.image?.url || 'https://placehold.co/900x600?text=StayNest' %>" class="card-img-top" style="height: 220px; object-fit: cover;" alt="<%= order.listing.title %>">
+          
+          <div class="card-body p-4">
+            <h5 class="fw-bold text-truncate"><%= order.listing.title %></h5>
+            
+            <p class="text-muted small mb-3">
+              <i class="fa-solid fa-location-dot me-1"></i><%= order.listing.location %>, <%= order.listing.country %>
+            </p>
+
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-secondary">Duration</span>
+              <span class="fw-semibold">
+                <%= order.nights %> <%= order.nights === 1 ? "Night" : "Nights" %>
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-secondary">Check-In</span>
+              <span class="fw-semibold">
+                <%= new Date(order.checkIn).toLocaleDateString("en-IN") %>
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-secondary">Check-Out</span>
+              <span class="fw-semibold">
+                <%= new Date(order.checkOut).toLocaleDateString("en-IN") %>
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-secondary">Amount Paid</span>
+              <span class="fw-bold text-danger">
+                ₹<%= (order.amountPaid || 0).toLocaleString("en-IN") %>
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-secondary">Status</span>
+              <% if (order.status === "Paid") { %>
+                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                  <i class="fa-solid fa-circle-check me-1"></i>Paid
+                </span>
+              <% } else if (order.status === "Created") { %>
+                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                  <i class="fa-solid fa-clock me-1"></i>Pending
+                </span>
+              <% } else { %>
+                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
+                  <i class="fa-solid fa-xmark me-1"></i>Failed
+                </span>
+              <% } %>
+            </div>
+
+            <div class="border-top mt-3 pt-3 small text-muted">
+              <p class="mb-1 text-truncate">
+                <strong>Order ID:</strong> <%= order.razorpayOrderId %>
+              </p>
+              <% if (order.razorpayPaymentId) { %>
+                <p class="mb-0 text-truncate">
+                  <strong>Payment ID:</strong> <%= order.razorpayPaymentId %>
+                </p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <div class="text-center py-5">
+    <i class="fa-solid fa-receipt fa-4x text-secondary mb-3"></i>
+    <h3 class="fw-bold">No Bookings Found</h3>
+    <p class="text-secondary mb-4">You haven't booked any stays yet.</p>
+    <a href="/listings" class="btn btn-danger btn-lg rounded-3 fw-bold px-4">Explore Properties</a>
+  </div>
+  <% } %>
+</div>

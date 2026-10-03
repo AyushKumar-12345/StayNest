@@ -1,12 +1,13 @@
 const Listing = require("../models/listing");
+const Order = require("../models/order");
 
 module.exports.index = async (req, res, next) => {
     try {
         const { search, category } = req.query;
         const query = {};
 
-        if (search) {
-            const searchRegex = { $regex: search, $options: "i" };
+        if (search && search.trim() !== "") {
+            const searchRegex = { $regex: search.trim(), $options: "i" };
             query.$or = [
                 { title: searchRegex },
                 { location: searchRegex },
@@ -14,12 +15,16 @@ module.exports.index = async (req, res, next) => {
             ];
         }
 
-        if (category) {
-            query.category = category;
+        if (category && category.trim() !== "") {
+            query.category = category.trim();
         }
 
         const allListings = await Listing.find(query);
-        res.render("listings/index.ejs", { allListings });
+        res.render("listings/index.ejs", { 
+            allListings, 
+            searchQuery: search || "",
+            selectedCategory: category || ""
+        });
     } catch (err) {
         next(err);
     }
@@ -51,7 +56,17 @@ module.exports.showListing = async (req, res, next) => {
             };
         }
 
-        res.render("listings/show.ejs", { listing });
+        const bookedOrders = await Order.find({
+            listing: id,
+            status: "Paid"
+        }).select("checkIn checkOut");
+
+        const bookedDateRanges = bookedOrders.map(order => ({
+            from: order.checkIn.toISOString().split("T")[0],
+            to: order.checkOut.toISOString().split("T")[0]
+        }));
+
+        res.render("listings/show.ejs", { listing, bookedDateRanges });
     } catch (err) {
         next(err);
     }

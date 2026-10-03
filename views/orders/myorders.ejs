@@ -1,99 +1,183 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="container my-5">
-  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+<style>
+  .order-card {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1);
+  }
+
+  .order-img {
+    height: 100%;
+    min-height: 220px;
+    object-fit: cover;
+    border-top-left-radius: 1.25rem;
+    border-bottom-left-radius: 1.25rem;
+  }
+
+  @media (max-width: 767px) {
+    .order-img {
+      border-radius: 1.25rem 1.25rem 0 0;
+      height: 200px;
+      width: 100%;
+    }
+  }
+
+  /* Unified button styles for perfect alignment */
+  .order-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .btn-stay-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.65rem 1.15rem;
+    border-radius: 0.65rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    height: 38px;
+    box-sizing: border-box;
+  }
+
+  .btn-stay-view {
+    color: #475569;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+  }
+
+  .btn-stay-view:hover {
+    color: #0f172a;
+    background: #f8fafc;
+    border-color: #94a3b8;
+  }
+
+  .btn-stay-receipt {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #ff385c, #e11d48);
+    border: 1.5px solid transparent;
+  }
+
+  .btn-stay-receipt:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 56, 92, 0.35);
+    color: #ffffff;
+  }
+</style>
+
+<div class="container my-4">
+  <div class="d-flex align-items-center mb-4">
     <h2 class="fw-bold mb-0">
-      <i class="fa-solid fa-clock-history text-danger me-2"></i>My Bookings & Orders
+      <i class="fa-solid fa-bag-shopping text-danger me-2"></i>My Bookings & Orders
     </h2>
-    <a href="/listings" class="btn btn-outline-dark px-4 rounded-pill fw-bold btn-sm shadow-sm">
-      <i class="fa-solid fa-arrow-left me-2"></i>Back to Stays
-    </a>
+    <span class="badge bg-danger-subtle text-danger ms-3 px-3 py-2 rounded-pill fw-semibold">
+      <%= orders?.length || 0 %> <%= (orders?.length === 1) ? 'Reservation' : 'Reservations' %>
+    </span>
   </div>
 
-  <hr class="mb-4">
-
-  <% if (typeof orders !== 'undefined' && orders?.length) { %>
-  <div class="row g-4">
-    <% orders.forEach(order => { %>
-      <% if (order.listing) { %>
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-          <img src="<%= order.listing.image?.url || 'https://placehold.co/900x600?text=StayNest' %>" class="card-img-top" style="height: 220px; object-fit: cover;" alt="<%= order.listing.title %>">
-          
-          <div class="card-body p-4">
-            <h5 class="fw-bold text-truncate"><%= order.listing.title %></h5>
-            
-            <p class="text-muted small mb-3">
-              <i class="fa-solid fa-location-dot me-1"></i><%= order.listing.location %>, <%= order.listing.country %>
-            </p>
-
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-secondary">Duration</span>
-              <span class="fw-semibold">
-                <%= order.nights %> <%= order.nights === 1 ? "Night" : "Nights" %>
-              </span>
+  <% if (orders && orders.length) { %>
+    <div class="d-flex flex-column gap-4">
+      <% orders.forEach(order => { %>
+        <div class="card order-card overflow-hidden">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <img src="<%= order.listing?.image?.url || 'https://placehold.co/600x400?text=StayNest' %>" 
+                   class="order-img w-100" 
+                   alt="<%= order.listing?.title || 'Listing' %>">
             </div>
+            <div class="col-md-8">
+              <div class="card-body p-4 d-flex flex-column justify-content-between h-100">
+                <div>
+                  <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+                    <h5 class="fw-bold mb-0">
+                      <a href="/listings/<%= order.listing?._id %>" class="text-decoration-none text-dark">
+                        <%= order.listing?.title || "Property Unavailable" %>
+                      </a>
+                    </h5>
+                    <% if (order.status === 'Paid') { %>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                        <i class="fa-solid fa-check-circle me-1"></i>Confirmed & Paid
+                      </span>
+                    <% } else if (order.status === 'Created') { %>
+                      <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill">
+                        <i class="fa-solid fa-clock me-1"></i>Pending
+                      </span>
+                    <% } else { %>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">
+                        <i class="fa-solid fa-circle-xmark me-1"></i>Failed
+                      </span>
+                    <% } %>
+                  </div>
 
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-secondary">Check-In</span>
-              <span class="fw-semibold">
-                <%= new Date(order.checkIn).toLocaleDateString("en-IN") %>
-              </span>
-            </div>
+                  <p class="text-muted small mb-3">
+                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>
+                    <%= order.listing?.location %>, <%= order.listing?.country %>
+                  </p>
 
-            <div class="d-flex justify-content-between mb-3">
-              <span class="text-secondary">Check-Out</span>
-              <span class="fw-semibold">
-                <%= new Date(order.checkOut).toLocaleDateString("en-IN") %>
-              </span>
-            </div>
+                  <div class="row g-2 mb-3 bg-light rounded-3 p-3 text-secondary small">
+                    <div class="col-sm-4">
+                      <div class="fw-bold text-dark">Check-In</div>
+                      <div><%= new Date(order.checkIn).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %></div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="fw-bold text-dark">Check-Out</div>
+                      <div><%= new Date(order.checkOut).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %></div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="fw-bold text-dark">Duration</div>
+                      <div><%= order.nights %> <%= order.nights === 1 ? 'Night' : 'Nights' %></div>
+                    </div>
+                  </div>
+                </div>
 
-            <div class="d-flex justify-content-between mb-3">
-              <span class="text-secondary">Amount Paid</span>
-              <span class="fw-bold text-danger">
-                ₹<%= (order.amountPaid || 0).toLocaleString("en-IN") %>
-              </span>
-            </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-3 border-top">
+                  <div class="d-flex align-items-baseline gap-1">
+                    <span class="text-muted small">Total Paid:</span>
+                    <span class="fw-bold text-danger fs-5">₹<%= (order.amountPaid || 0).toLocaleString("en-IN") %></span>
+                  </div>
 
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="text-secondary">Status</span>
-              <% if (order.status === "Paid") { %>
-                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                  <i class="fa-solid fa-circle-check me-1"></i>Paid
-                </span>
-              <% } else if (order.status === "Created") { %>
-                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                  <i class="fa-solid fa-clock me-1"></i>Pending
-                </span>
-              <% } else { %>
-                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">
-                  <i class="fa-solid fa-xmark me-1"></i>Failed
-                </span>
-              <% } %>
-            </div>
-
-            <div class="border-top mt-3 pt-3 small text-muted">
-              <p class="mb-1 text-truncate">
-                <strong>Order ID:</strong> <%= order.razorpayOrderId %>
-              </p>
-              <% if (order.razorpayPaymentId) { %>
-                <p class="mb-0 text-truncate">
-                  <strong>Payment ID:</strong> <%= order.razorpayPaymentId %>
-                </p>
-              <% } %>
+                  <div class="order-actions">
+                    <a href="/listings/<%= order.listing?._id %>" class="btn-stay-action btn-stay-view">
+                      <i class="fa-regular fa-eye"></i>
+                      <span>View Stay</span>
+                    </a>
+                    <% if (order.status === 'Paid') { %>
+                      <a href="/orders/<%= order._id %>/invoice" class="btn-stay-action btn-stay-receipt">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>Download Invoice</span>
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <% } %>
-    <% }) %>
-  </div>
+      <% }) %>
+    </div>
   <% } else { %>
-  <div class="text-center py-5">
-    <i class="fa-solid fa-receipt fa-4x text-secondary mb-3"></i>
-    <h3 class="fw-bold">No Bookings Found</h3>
-    <p class="text-secondary mb-4">You haven't booked any stays yet.</p>
-    <a href="/listings" class="btn btn-danger btn-lg rounded-3 fw-bold px-4">Explore Properties</a>
-  </div>
+    <div class="text-center my-5 py-5">
+      <div class="text-danger mb-4">
+        <i class="fa-regular fa-calendar-xmark fa-4x"></i>
+      </div>
+      <h3 class="fw-bold">No Bookings Found</h3>
+      <p class="text-secondary mb-4">You have not booked any stays yet. Discover amazing homes and plan your trip today!</p>
+      <a href="/listings" class="btn btn-danger btn-lg rounded-3 fw-bold">
+        <i class="fa-solid fa-compass me-2"></i>Explore Stays
+      </a>
+    </div>
   <% } %>
 </div>

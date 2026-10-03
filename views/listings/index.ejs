@@ -12,11 +12,13 @@
   .filter {
     text-align: center;
     margin-right: 2rem;
-    opacity: 0.7;
-    transition: 0.2s ease;
+    opacity: 0.65;
+    transition: all 0.2s ease;
     text-decoration: none;
-    color: inherit;
+    color: #4b5563;
     min-width: 60px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid transparent;
   }
 
   .filter:hover {
@@ -25,9 +27,18 @@
     color: #ff385c;
   }
 
+  .filter.active {
+    opacity: 1 !important;
+    color: #ff385c !important;
+    font-weight: 700;
+    border-bottom: 2.5px solid #ff385c;
+    transform: translateY(-2px);
+  }
+
   .filter p {
     font-size: 0.75rem;
     margin-top: 0.25rem;
+    margin-bottom: 0;
     font-weight: 600;
   }
 
@@ -39,14 +50,30 @@
     display: none;
   }
 
+  .listing-card-wrapper {
+    position: relative;
+    border-radius: 1.25rem;
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
+    will-change: transform;
+    background: #ffffff;
+  }
+
+  .listing-card-wrapper:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+  }
+
   .listing-card {
     border: none !important;
-    margin-bottom: 2rem;
-    transition: 0.2s ease;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+    margin-bottom: 0 !important;
   }
 
   .listing-card:hover {
-    transform: translateY(-4px);
+    transform: none !important;
+    box-shadow: none !important;
   }
 
   .listing-img {
@@ -54,6 +81,14 @@
     width: 100%;
     height: 18rem !important;
     object-fit: cover;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .listing-card:hover .listing-img,
+  .listing-card-wrapper:hover .listing-img,
+  .listing-card:hover .card-img-top {
+    transform: none !important;
   }
 
   .card-body {
@@ -64,67 +99,94 @@
     text-decoration: none;
     color: inherit;
   }
+
+  .fav-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 5;
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 4px;
+    transition: transform 0.2s ease;
+    color: #ffffff;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+  }
+
+  .fav-btn:hover {
+    transform: scale(1.15);
+  }
+
+  .fav-btn.active {
+    color: #ff385c;
+  }
 </style>
 
-<div class="container my-3">
+<!-- Pass authentication status via clean HTML data-attribute so VS Code does not throw JS errors -->
+<div class="container my-3" id="listings-view-root" data-authenticated="<%= (typeof currUser !== 'undefined' && currUser) ? 'true' : 'false' %>">
+  <% const activeCat = typeof selectedCategory !== 'undefined' ? selectedCategory : ''; %>
   <div id="filters">
-    <a href="/listings" class="filter">
+    <a href="/listings" class="filter <%= !activeCat ? 'active' : '' %>">
       <i class="fa-solid fa-border-all"></i>
       <p>All</p>
     </a>
 
-    <a href="/listings?category=Trending" class="filter">
+    <a href="/listings?category=Trending" class="filter <%= activeCat === 'Trending' ? 'active' : '' %>">
       <i class="fa-solid fa-fire"></i>
       <p>Trending</p>
     </a>
 
-    <a href="/listings?category=Rooms" class="filter">
+    <a href="/listings?category=Rooms" class="filter <%= activeCat === 'Rooms' ? 'active' : '' %>">
       <i class="fa-solid fa-bed"></i>
       <p>Rooms</p>
     </a>
 
-    <a href="/listings?category=Cities" class="filter">
-      <i class="fa-solid fa-mountain-city"></i>
+    <a href="/listings?category=Cities" class="filter <%= activeCat === 'Cities' ? 'active' : '' %>">
+      <i class="fa-solid fa-city"></i>
       <p>Cities</p>
     </a>
 
-    <a href="/listings?category=Mountains" class="filter">
+    <a href="/listings?category=Mountains" class="filter <%= activeCat === 'Mountains' ? 'active' : '' %>">
       <i class="fa-solid fa-mountain"></i>
       <p>Mountains</p>
     </a>
 
-    <a href="/listings?category=Castles" class="filter">
-      <i class="fa-solid fa-fort-awesome"></i>
+    <a href="/listings?category=Castles" class="filter <%= activeCat === 'Castles' ? 'active' : '' %>">
+      <i class="fa-brands fa-fort-awesome"></i>
       <p>Castles</p>
     </a>
 
-    <a href="/listings?category=Pools" class="filter">
+    <a href="/listings?category=Pools" class="filter <%= activeCat === 'Pools' ? 'active' : '' %>">
       <i class="fa-solid fa-person-swimming"></i>
       <p>Pools</p>
     </a>
 
-    <a href="/listings?category=Camping" class="filter">
+    <a href="/listings?category=Camping" class="filter <%= activeCat === 'Camping' ? 'active' : '' %>">
       <i class="fa-solid fa-campground"></i>
       <p>Camping</p>
     </a>
 
-    <a href="/listings?category=Farms" class="filter">
-      <i class="fa-solid fa-cow"></i>
+    <a href="/listings?category=Farms" class="filter <%= activeCat === 'Farms' ? 'active' : '' %>">
+      <i class="fa-solid fa-wheat-awn"></i>
       <p>Farms</p>
     </a>
 
-    <a href="/listings?category=Arctic" class="filter">
+    <a href="/listings?category=Arctic" class="filter <%= activeCat === 'Arctic' ? 'active' : '' %>">
       <i class="fa-solid fa-snowflake"></i>
       <p>Arctic</p>
     </a>
 
-    <a href="/listings?category=Domes" class="filter">
+    <a href="/listings?category=Domes" class="filter <%= activeCat === 'Domes' ? 'active' : '' %>">
       <i class="fa-solid fa-igloo"></i>
       <p>Domes</p>
     </a>
 
-    <a href="/listings?category=Boats" class="filter">
-      <i class="fa-solid fa-ship"></i>
+    <a href="/listings?category=Boats" class="filter <%= activeCat === 'Boats' ? 'active' : '' %>">
+      <i class="fa-solid fa-sailboat"></i>
       <p>Boats</p>
     </a>
   </div>
@@ -135,24 +197,29 @@
     <% if (allListings?.length) { %>
       <% allListings.forEach(listing => { %>
         <div class="col">
-          <a href="/listings/<%= listing._id %>" class="listing-link">
-            <div class="card listing-card h-100 shadow-sm p-2 rounded-4">
-              <img src="<%= listing.image?.url || 'https://placehold.co/900x600?text=StayNest' %>" class="card-img-top listing-img" alt="<%= listing.title %>">
-              <div class="card-body">
-                <h5 class="fw-bold text-truncate mb-1"><%= listing.title %></h5>
-                <p class="text-muted small mb-2">
-                  <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
-                </p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="fw-bold text-danger">
-                    ₹<%= (listing.price || 0).toLocaleString("en-IN") %>
-                    <span class="text-secondary fw-normal small">/ night</span>
-                  </span>
-                  <span class="badge bg-light text-dark border"><%= listing.category %></span>
+          <div class="listing-card-wrapper h-100 p-2">
+            <button class="fav-btn <%= (typeof currUser !== 'undefined' && currUser && currUser.favorites && currUser.favorites.some(f => f.toString() === listing._id.toString())) ? 'active' : '' %>" data-listing-id="<%= listing._id %>" aria-label="Favorite">
+              <i class="<%= (typeof currUser !== 'undefined' && currUser && currUser.favorites && currUser.favorites.some(f => f.toString() === listing._id.toString())) ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
+            </button>
+            <a href="/listings/<%= listing._id %>" class="listing-link">
+              <div class="card listing-card h-100">
+                <img src="<%= listing.image?.url || 'https://placehold.co/900x600?text=StayNest' %>" class="card-img-top listing-img" alt="<%= listing.title %>">
+                <div class="card-body">
+                  <h5 class="fw-bold text-truncate mb-1"><%= listing.title %></h5>
+                  <p class="text-muted small mb-2">
+                    <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
+                  </p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-danger">
+                      ₹<%= (listing.price || 0).toLocaleString("en-IN") %>
+                      <span class="text-secondary fw-normal small">/ night</span>
+                    </span>
+                    <span class="badge bg-light text-dark border"><%= listing.category %></span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </a>
+            </a>
+          </div>
         </div>
       <% }) %>
     <% } else { %>
@@ -169,3 +236,56 @@
     <% } %>
   </div>
 </div>
+
+<script>
+  const rootContainer = document.getElementById("listings-view-root");
+  const isAuthenticated = rootContainer ? rootContainer.getAttribute("data-authenticated") === "true" : false;
+
+  document.querySelectorAll(".fav-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const listingId = btn.getAttribute("data-listing-id");
+      try {
+        const res = await fetch(`/listings/${listingId}/favorite`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (res.redirected) {
+          window.location.href = res.url;
+          return;
+        }
+
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          const icon = btn.querySelector("i");
+          if (data.isFavorite) {
+            btn.classList.add("active");
+            icon.classList.remove("fa-regular");
+            icon.classList.add("fa-solid");
+          } else {
+            btn.classList.remove("active");
+            icon.classList.remove("fa-solid");
+            icon.classList.add("fa-regular");
+          }
+        }
+      } catch (err) {
+        console.error("Favorite toggle error:", err);
+      }
+    });
+  });
+</script>

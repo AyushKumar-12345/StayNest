@@ -1,0 +1,157 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .listing-card-wrapper {
+    position: relative;
+    border-radius: 1.25rem;
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1);
+    will-change: transform;
+    background: #ffffff;
+  }
+
+  .listing-card-wrapper:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+  }
+
+  .listing-card {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+    margin-bottom: 0 !important;
+  }
+
+  .listing-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .listing-img {
+    border-radius: 1rem !important;
+    width: 100%;
+    height: 18rem !important;
+    object-fit: cover;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .card-body {
+    padding: 0.5rem 0 !important;
+  }
+
+  .listing-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .fav-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 5;
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 4px;
+    transition: transform 0.2s ease;
+    color: #ff385c;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+  }
+
+  .fav-btn:hover {
+    transform: scale(1.15);
+  }
+</style>
+
+<div class="container my-4">
+  <div class="d-flex align-items-center mb-4">
+    <h2 class="fw-bold mb-0">
+      <i class="fa-solid fa-heart text-danger me-2"></i>My Wishlist
+    </h2>
+    <span class="badge bg-danger-subtle text-danger ms-3 px-3 py-2 rounded-pill fw-semibold">
+      <%= allListings?.length || 0 %> <%= (allListings?.length === 1) ? 'Stay' : 'Stays' %> Saved
+    </span>
+  </div>
+
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-1 g-4 justify-content-start">
+    <% if (allListings?.length) { %>
+      <% allListings.forEach(listing => { %>
+        <div class="col" id="wishlist-col-<%= listing._id %>">
+          <div class="listing-card-wrapper h-100 p-2">
+            <button class="fav-btn" data-listing-id="<%= listing._id %>" aria-label="Remove from Wishlist">
+              <i class="fa-solid fa-heart"></i>
+            </button>
+            <a href="/listings/<%= listing._id %>" class="listing-link">
+              <div class="card listing-card h-100">
+                <img src="<%= listing.image?.url || 'https://placehold.co/900x600?text=StayNest' %>" class="card-img-top listing-img" alt="<%= listing.title %>">
+                <div class="card-body">
+                  <h5 class="fw-bold text-truncate mb-1"><%= listing.title %></h5>
+                  <p class="text-muted small mb-2">
+                    <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
+                  </p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-danger">
+                      ₹<%= (listing.price || 0).toLocaleString("en-IN") %>
+                      <span class="text-secondary fw-normal small">/ night</span>
+                    </span>
+                    <span class="badge bg-light text-dark border"><%= listing.category %></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-12 text-center my-5 py-5 w-100">
+        <div class="text-danger mb-4">
+          <i class="fa-regular fa-heart fa-4x"></i>
+        </div>
+        <h3 class="fw-bold">Your Wishlist is Empty</h3>
+        <p class="text-secondary mb-4">Explore stays and tap the heart icon on properties you like to save them here.</p>
+        <a href="/listings" class="btn btn-danger btn-lg rounded-3 fw-bold">
+          <i class="fa-solid fa-compass me-2"></i>Explore Stays
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll(".fav-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const listingId = btn.getAttribute("data-listing-id");
+      try {
+        const res = await fetch(`/listings/${listingId}/favorite`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json();
+        if (data.success && !data.isFavorite) {
+          const col = document.getElementById(`wishlist-col-${listingId}`);
+          if (col) {
+            col.remove();
+          }
+          const remaining = document.querySelectorAll("[id^='wishlist-col-']").length;
+          const badge = document.querySelector(".badge");
+          if (badge) {
+            badge.textContent = `${remaining} ${remaining === 1 ? 'Stay' : 'Stays'} Saved`;
+          }
+          if (remaining === 0) {
+            window.location.reload();
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  });
+</script>

@@ -19,6 +19,126 @@
     
     <link rel="stylesheet" href="/css/style.css?v=<%= Date.now() %>">
     <link rel="stylesheet" href="/css/rating.css?v=<%= Date.now() %>">
+
+    <style>
+      #ai-chat-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff385c, #e11d48);
+        color: white;
+        border: none;
+        box-shadow: 0 8px 24px rgba(255, 56, 92, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        cursor: pointer;
+        z-index: 1050;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      #ai-chat-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 28px rgba(255, 56, 92, 0.55);
+      }
+
+      #ai-chat-box {
+        position: fixed;
+        bottom: 92px;
+        right: 24px;
+        width: 360px;
+        max-width: calc(100vw - 48px);
+        height: 480px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 1050;
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+      }
+
+      #ai-chat-box.d-none {
+        display: none !important;
+      }
+
+      .ai-chat-header {
+        background: linear-gradient(135deg, #ff385c, #e11d48);
+        color: white;
+        padding: 14px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+      }
+
+      .ai-chat-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .ai-bubble {
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 0.88rem;
+        line-height: 1.45;
+        max-width: 82%;
+        word-wrap: break-word;
+      }
+
+      .ai-bubble-bot {
+        background: #ffffff;
+        color: #1f2937;
+        align-self: flex-start;
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 4px;
+      }
+
+      .ai-bubble-user {
+        background: #ff385c;
+        color: #ffffff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+
+      .ai-chat-footer {
+        padding: 10px 12px;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 8px;
+      }
+
+      .ai-chat-footer input {
+        border-radius: 999px;
+        font-size: 0.88rem;
+        padding: 8px 14px;
+      }
+
+      .ai-chat-footer button {
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ff385c;
+        color: white;
+        border: none;
+      }
+    </style>
 </head>
 <body>
 
@@ -29,13 +149,87 @@
         <%- body %>
     </main>
 
+    <button id="ai-chat-btn" aria-label="Open StayNest AI">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+    </button>
+
+    <div id="ai-chat-box" class="d-none">
+      <div class="ai-chat-header">
+        <span><i class="fa-solid fa-sparkles me-2"></i>StayNest AI</span>
+        <button id="ai-chat-close" style="background: none; border: none; color: white; font-size: 1.1rem; cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="ai-chat-body" id="ai-chat-body">
+        <div class="ai-bubble ai-bubble-bot">
+          Hi! Looking for the perfect stay or have a budget in mind? Ask me anything!
+        </div>
+      </div>
+      <form id="ai-chat-form" class="ai-chat-footer">
+        <input type="text" id="ai-chat-input" class="form-control" placeholder="Ask AI assistant..." autocomplete="off">
+        <button type="submit"><i class="fa-solid fa-arrow-up"></i></button>
+      </form>
+    </div>
+
     <%- include("../includes/footer.ejs") %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    
     <script src="/js/script.js?v=<%= Date.now() %>"></script>
 
+    <script>
+      const aiBtn = document.getElementById("ai-chat-btn");
+      const aiBox = document.getElementById("ai-chat-box");
+      const aiClose = document.getElementById("ai-chat-close");
+      const aiForm = document.getElementById("ai-chat-form");
+      const aiInput = document.getElementById("ai-chat-input");
+      const aiBody = document.getElementById("ai-chat-body");
+
+      if (aiBtn && aiBox) {
+        aiBtn.addEventListener("click", () => {
+          aiBox.classList.toggle("d-none");
+          if (!aiBox.classList.contains("d-none")) {
+            aiInput.focus();
+          }
+        });
+
+        aiClose.addEventListener("click", () => {
+          aiBox.classList.add("d-none");
+        });
+
+        aiForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const userMsg = aiInput.value.trim();
+          if (!userMsg) return;
+
+          const userBubble = document.createElement("div");
+          userBubble.className = "ai-bubble ai-bubble-user";
+          userBubble.textContent = userMsg;
+          aiBody.appendChild(userBubble);
+          aiInput.value = "";
+          aiBody.scrollTop = aiBody.scrollHeight;
+
+          const botBubble = document.createElement("div");
+          botBubble.className = "ai-bubble ai-bubble-bot";
+          botBubble.innerHTML = '<i class="fa-solid fa-ellipsis fa-fade"></i>';
+          aiBody.appendChild(botBubble);
+          aiBody.scrollTop = aiBody.scrollHeight;
+
+          try {
+            const res = await fetch("/api/ai/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message: userMsg })
+            });
+            const data = await res.json();
+            botBubble.textContent = data.reply || "Sorry, I could not process that request.";
+          } catch (err) {
+            botBubble.textContent = "Error connecting to AI assistant.";
+          }
+          aiBody.scrollTop = aiBody.scrollHeight;
+        });
+      }
+    </script>
 </body>
 </html>

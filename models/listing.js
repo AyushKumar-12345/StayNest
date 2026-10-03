@@ -36,6 +36,16 @@ const listingSchema = new Schema(
             type: String,
             required: true
         },
+        coordinates: {
+            lat: {
+                type: Number,
+                default: 28.6139
+            },
+            lng: {
+                type: Number,
+                default: 77.2090
+            }
+        },
         reviews: [
             {
                 type: Schema.Types.ObjectId,

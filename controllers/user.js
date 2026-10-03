@@ -52,3 +52,40 @@ module.exports.logout = (req, res, next) => {
         res.redirect("/listings");
     });
 };
+
+module.exports.toggleFavorite = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "Please log in first" });
+        }
+
+        const { id } = req.params;
+        const user = await User.findById(req.user._id);
+
+        const index = user.favorites.indexOf(id);
+        let isFavorite = false;
+
+        if (index === -1) {
+            user.favorites.push(id);
+            isFavorite = true;
+        } else {
+            user.favorites.splice(index, 1);
+            isFavorite = false;
+        }
+
+        await user.save();
+        res.json({ success: true, isFavorite });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports.renderWishlist = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id).populate("favorites");
+        const allListings = user.favorites || [];
+        res.render("users/wishlist.ejs", { allListings });
+    } catch (err) {
+        next(err);
+    }
+};

@@ -1,305 +1,82 @@
-# 🏡 StayNest – Full Stack Accommodation Booking Platform
+# 🏡 StayNest – Vacation Rental Platform
 
-![Node.js](https://img.shields.io/badge/Node.js-Express-green?logo=node.js)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-success?logo=mongodb)
-![EJS](https://img.shields.io/badge/Frontend-EJS-blue)
-![Passport.js](https://img.shields.io/badge/Auth-Passport.js-success)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-Media-blue?logo=cloudinary)
-![License](https://img.shields.io/badge/License-Portfolio-orange)
+A full-stack accommodation booking platform inspired by Airbnb. Features real-time property discovery, collision-proof booking with blackout calendars, Razorpay payments, automated PDF invoices, and an AI travel assistant.
+
+🌐 **Live Demo:** [https://staynest-dnrm.onrender.com](https://staynest-dnrm.onrender.com)
 
 ---
 
-## 📖 Overview
+## ⚡ Highlights
 
-StayNest is a **Full Stack Accommodation Booking Platform** inspired by Airbnb.
-
-The application allows users to browse accommodation listings, book stays, make secure online payments, upload property images, and leave reviews.
-
-It also provides secure user authentication and a clean booking experience built with **Node.js, Express.js, MongoDB, EJS, Passport.js, and Cloudinary.**
-
----
-
-## 🌐 Live Demo
-
-https://staynest-dnrm.onrender.com
-
----
-# ✨ Features
-
-## 🏡 Accommodation Booking
-
-- Browse accommodation listings
-- View complete property details
-- Book stays with check-in and check-out dates
-- Automatic stay duration calculation
-- Instant booking price calculation
-- Booking history management
-- Booking status tracking
+- **Dynamic Discovery & Search:** Instant category filters (Rooms, Trending, Castles, Domes, etc.) and search across location, country, and stay title.
+- **Collision-Proof Bookings:** Flatpickr calendar with real-time blackout date ranges to prevent overlapping reservations.
+- **Razorpay Integration:** Complete payment workflow with cryptographic signature verification and fallback handling.
+- **Instant Invoicing:** Automated PDF booking receipts and invoices generated via PDFKit.
+- **AI Concierge:** Google Gemini API integration for automated listing description drafting and guest query assistance.
+- **Profiles & Reviews:** Dynamic initial/image avatars, custom user profiles, guest wishlists, and 5-star ratings.
 
 ---
 
-## 🔐 Authentication
+## 🛠 Tech Stack
 
-- Secure User Registration
-- User Login & Logout
-- Passport.js Authentication
-- Session Management
-- Authorization & Protected Routes
+- **Backend:** Node.js, Express.js, MongoDB Atlas, Mongoose, Passport.js
+- **Frontend:** EJS, Bootstrap 5, Leaflet (OpenStreetMap), Flatpickr, FontAwesome
+- **Integrations:** Cloudinary, Razorpay, Google Gemini API, PDFKit
 
 ---
 
-## 💳 Secure Payments
+## 🚀 Quick Setup
 
-- Razorpay Payment Gateway
-- Secure Server-side Order Creation
-- Payment Signature Verification
-- Successful Payment Confirmation
-- Failed Payment Handling
-
----
-
-## ⭐ Reviews & Ratings
-
-- 5-Star Rating System
-- User Reviews
-- Review Management
-- Author-based Permissions
-
----
-
-## ☁️ Image Management
-
-- Cloudinary Image Hosting
-- Image Upload using Multer
-- Optimized Image Delivery
-- Multiple Image Format Support
-
----
-# 🛠️ Tech Stack
-
-## 🎨 Frontend
-
-- EJS (Embedded JavaScript Templates)
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript (ES6)
-
----
-
-## ⚙️ Backend
-
-- Node.js
-- Express.js
-- MongoDB Atlas
-- Mongoose
-- Passport.js Authentication
-- Express Session
-- Joi Validation
-
----
-
-## ☁️ Cloud & Services
-
-- Cloudinary (Image Storage)
-- Multer (Image Upload)
-- Razorpay (Payment Gateway)
-
----
-
-## 🧰 Development Tools
-
-- Git & GitHub
-- Visual Studio Code
-- Postman
-- MongoDB Compass
-- Render
-- npm
-
----
-# 🌐 Live Demo
-
-🏡 **Live Website**
-
-https://staynest-dnrm.onrender.com
-
----
-
-# 📁 Project Structure
-
-```text
-StayNest
-│
-├── controllers/        # Business logic
-├── models/             # MongoDB models
-├── routes/             # Express routes
-├── views/              # EJS templates
-├── public/             # Static assets
-├── utils/              # Utility functions
-├── middleware/         # Authentication & validation
-├── app.js              # Main application
-├── package.json
-└── README.md
-```
-
----
-
-# ⚙️ Local Setup
-
-## 1️⃣ Clone Repository
-
+### 1. Clone & Install
 ```bash
 git clone https://github.com/AyushKumar-12345/StayNest.git
 cd StayNest
-```
-
----
-
-## 2️⃣ Install Dependencies
-
-```bash
 npm install
 ```
 
----
-
-## 3️⃣ Configure Environment Variables
-
-Create a `.env` file in the project root.
-
----
-
-## 4️⃣ Start the Development Server
-
-```bash
-npm start
-```
-
----
-
-## 5️⃣ Open in Browser
-
-```
-http://localhost:3000
-```
-
----
-# 🔑 Environment Variables
-
-Create a `.env` file in the project root and configure the following variables:
-
+### 2. Configure Environment (`.env`)
 ```env
+PORT=8080
 ATLASDB_URL=your_mongodb_connection_string
-
 SECRET=your_session_secret
-
-CLOUD_NAME=your_cloudinary_cloud_name
-CLOUD_API_KEY=your_cloudinary_api_key
-CLOUD_API_SECRET=your_cloudinary_api_secret
-
+CLOUD_NAME=your_cloudinary_name
+CLOUD_API_KEY=your_cloudinary_key
+CLOUD_API_SECRET=your_cloudinary_secret
 RAZORPAY_KEY_ID=your_razorpay_key
 RAZORPAY_KEY_SECRET=your_razorpay_secret
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+### 3. Seed Database & Run
+```bash
+node init/initData.js
+npm start
+```
+Visit `http://localhost:8080` in your browser.
+
+---
+
+## 📁 Repository Layout
+
+```text
+StayNest/
+├── controllers/     # Route business logic (listings, reviews, users)
+├── models/          # Mongoose models (Listing, Review, User, Order)
+├── routes/          # Express route definitions
+├── views/           # EJS views (listings, orders, users, partials)
+├── public/          # Static assets (CSS, client JS, images)
+├── utils/           # Error handling and async wrappers
+├── cloudconfig.js   # Cloudinary configuration
+└── app.js           # Server entry point & API routes
 ```
 
 ---
 
-# 📸 Application Preview
+## 👨‍💻 Developer
 
-## 🏠 Home Page
-
-> _Screenshot Coming Soon_
-
----
-
-## 🏡 Property Listing
-
-> _Screenshot Coming Soon_
-
----
-
-## 📄 Property Details
-
-> _Screenshot Coming Soon_
-
----
-
-## 📅 Booking Page
-
-> _Screenshot Coming Soon_
-
----
-
-## 💳 Razorpay Payment
-
-> _Screenshot Coming Soon_
-
----
-
-## ⭐ Reviews & Ratings
-
-> _Screenshot Coming Soon_
-
----
-
-## 👤 User Profile
-
-> _Screenshot Coming Soon_
-
----
-
-# 🚀 Future Improvements
-
-- ❤️ Wishlist
-- 📍 Interactive Maps
-- 💬 Real-time Chat
-- 📧 Email Notifications
-- 🔔 Push Notifications
-- ⭐ Property Favorites
-- 🌙 Dark Mode
-- 📱 Progressive Web App (PWA)
-- 🌍 Multi-language Support
-
----
-
-# 📄 License
-
-This project is developed for **learning, educational, and portfolio purposes**.
-
----
-
-# 👨‍💻 Developer
-
-## Ayush Kumar
-
-**B.Tech Information Technology**  
-**IIIT Bhubaneswar**
-
-📧 **Email**  
-ayushkumardandapat200@gmail.com
-
-💼 **LinkedIn**  
-https://www.linkedin.com/in/ayush-kumar-97326636a/
-
-💻 **GitHub**  
-https://github.com/AyushKumar-12345
-
-🌐 **Portfolio**  
-https://ayush-portfolio-3yan.onrender.com
-
----
-
-# ⭐ Support
-
-If you found this project helpful, please consider giving it a **⭐ Star** on GitHub.
-
-It helps increase the visibility of the project and supports my work.
-
----
-
-<div align="center">
-
-### 🏡 Built with ❤️ using Node.js, Express & MongoDB
-
-**Thank you for visiting this repository!**
-
-</div>
+**Ayush Kumar**  
+Information Technology | IIIT Bhubaneswar  
+- **Email:** ayushkumardandapat200@gmail.com
+- **LinkedIn:** [https://www.linkedin.com/in/ayush-kumar-97326636a/](https://www.linkedin.com/in/ayush-kumar-97326636a/)
+- **GitHub:** [https://github.com/AyushKumar-12345](https://github.com/AyushKumar-12345)
+- **Portfolio:** [https://ayush-portfolio-3yan.onrender.com](https://ayush-portfolio-3yan.onrender.com)

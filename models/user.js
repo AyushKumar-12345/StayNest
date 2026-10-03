@@ -26,7 +26,13 @@ const userSchema = new Schema({
             type: String,
             default: "default-profile"
         }
-    }
+    },
+    favorites: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Listing"
+        }
+    ]
 });
 
 userSchema.plugin(passportLocalMongoose);

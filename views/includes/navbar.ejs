@@ -29,34 +29,49 @@
   }
 
   .search-form {
-    max-width: 430px;
+    max-width: 420px;
     width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
   }
 
   .search-inp {
-    border-radius: 999px;
-    border: 1px solid #ddd;
-    padding: 0.65rem 1.2rem;
-    font-size: 0.95rem;
+    border-radius: 999px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 0.62rem 3.4rem 0.62rem 1.25rem !important;
+    font-size: 0.9rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.25s ease;
+    width: 100%;
   }
 
   .search-inp:focus {
-    border-color: #ff385c;
-    box-shadow: 0 0 0 0.18rem rgba(255, 56, 92, 0.18);
+    border-color: #ff385c !important;
+    box-shadow: 0 4px 18px rgba(255, 56, 92, 0.16) !important;
   }
 
   .search-btn {
-    background: #ff385c;
-    color: white;
-    border: none;
-    border-radius: 999px;
-    padding: 0.65rem 1.3rem;
-    font-weight: 600;
+    position: absolute;
+    right: 5px;
+    background: #ff385c !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.85rem !important;
+    transition: transform 0.2s ease, background-color 0.2s ease;
   }
 
   .search-btn:hover {
-    background: #e61e4d;
-    color: white;
+    background: #e61e4d !important;
+    transform: scale(1.06);
   }
 
   .nav-profile-img {
@@ -65,6 +80,24 @@
     object-fit: cover;
     border-radius: 50%;
     border: 1.5px solid #ff385c;
+    display: inline-block;
+  }
+
+  .nav-profile-initial {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff385c 0%, #e11d48 100%);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border: 1px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(255, 56, 92, 0.35);
+    line-height: 1;
   }
 
   @media (max-width: 991px) {
@@ -92,11 +125,10 @@
       </ul>
 
       <% if (typeof pageUrl !== 'undefined' && pageUrl && pageUrl.startsWith("/listings") && pageUrl !== "/listings/new") { %>
-      <form class="d-flex search-form mx-lg-auto my-3 my-lg-0" action="/listings" method="GET">
-        <input class="form-control search-inp me-2" type="search" name="search" placeholder="Search destinations...">
-        <button class="btn search-btn">
-          <i class="fa-solid fa-magnifying-glass me-1"></i>
-          Search
+      <form class="search-form mx-lg-auto my-3 my-lg-0" action="/listings" method="GET" autocomplete="off">
+        <input class="form-control search-inp" type="search" name="search" placeholder="Search destinations, stays..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" autocomplete="off" spellcheck="false">
+        <button class="btn search-btn" type="submit" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </form>
       <% } else { %>
@@ -107,8 +139,26 @@
         <% if (typeof currUser !== 'undefined' && currUser) { %>
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center gap-2" href="/profile">
-            <img src="<%= currUser.profileImage?.url || 'https://placehold.co/80x80?text=User' %>" class="nav-profile-img" alt="Profile">
+            <% 
+              const hasCustomImg = currUser.profileImage?.url && 
+                                   !currUser.profileImage.url.includes("placehold.co") && 
+                                   !currUser.profileImage.url.includes("placeholder");
+              const name = currUser.username || (currUser.email ? currUser.email.split("@")[0] : "");
+              const initial = name ? name.trim().charAt(0).toUpperCase() : "U";
+            %>
+            <% if (hasCustomImg) { %>
+              <img src="<%= currUser.profileImage.url %>" class="nav-profile-img" alt="<%= name %>">
+            <% } else { %>
+              <span class="nav-profile-initial"><%= initial %></span>
+            <% } %>
             <span>Profile</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/wishlist">
+            <i class="fa-solid fa-heart me-1 text-danger"></i>
+            Wishlist
           </a>
         </li>
 

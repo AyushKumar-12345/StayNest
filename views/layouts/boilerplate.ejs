@@ -95,7 +95,7 @@
         line-height: 1.45;
         max-width: 82%;
         word-wrap: break-word;
-        white-space: pre-wrap;
+        white-space: pre-line;
       }
 
       .ai-bubble-bot {
@@ -162,9 +162,7 @@
         </button>
       </div>
       <div class="ai-chat-body" id="ai-chat-body">
-        <div class="ai-bubble ai-bubble-bot">
-          Hi! Looking for the perfect stay or have a budget in mind? Ask me anything!
-        </div>
+        <div class="ai-bubble ai-bubble-bot">Hi! Looking for the perfect stay or have a budget in mind? Ask me anything!</div>
       </div>
       <form id="ai-chat-form" class="ai-chat-footer">
         <input type="text" id="ai-chat-input" class="form-control" placeholder="Ask AI assistant..." autocomplete="off">
@@ -224,7 +222,7 @@
               body: JSON.stringify({ message: userMsg })
             });
             const data = await res.json();
-            botBubble.textContent = data.reply || "Sorry, I could not process that request.";
+            botBubble.textContent = (data.reply ? data.reply.trim() : "") || "Sorry, I could not process that request.";
           } catch (err) {
             botBubble.textContent = "Error connecting to AI assistant.";
           }

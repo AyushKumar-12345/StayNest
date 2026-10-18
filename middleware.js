@@ -5,6 +5,12 @@ const { listingSchema, reviewSchema } = require("./schema");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
+        if (req.xhr || (req.headers.accept && req.headers.accept.includes("json")) || req.originalUrl.startsWith("/api/")) {
+            return res.status(401).json({
+                success: false,
+                message: "Please log in to continue."
+            });
+        }
         req.session.redirectUrl = req.originalUrl;
         req.flash("error", "Please log in to continue.");
         return res.redirect("/login");

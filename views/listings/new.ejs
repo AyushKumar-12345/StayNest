@@ -8,17 +8,36 @@
           <i class="fa-solid fa-house-circle-check text-danger me-2"></i>Create a New Listing
         </h2>
 
-        <form method="POST" action="/listings" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form method="POST" action="/listings" enctype="multipart/form-data" class="needs-validation" novalidate id="new-listing-form">
           <div class="mb-4">
-            <label class="form-label fw-semibold">Title</label>
-            <input name="listing[title]" type="text" class="form-control" placeholder="e.g., Cozy Beachside Cottage" required>
+            <label for="listing-title" class="form-label fw-semibold">Title</label>
+            <input id="listing-title" name="listing[title]" type="text" class="form-control" placeholder="e.g., Cozy Beachside Cottage" required>
             <div class="invalid-feedback">Please enter a listing title.</div>
           </div>
 
           <div class="mb-4">
-            <label class="form-label fw-semibold">Description</label>
-            <textarea name="listing[description]" rows="5" class="form-control" placeholder="Describe your property..." required></textarea>
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <label for="listing-description" class="form-label fw-semibold mb-0">
+                Description
+              </label>
+              <div class="d-flex align-items-center gap-2">
+                <select id="ai-vibe" class="form-select form-select-sm border-danger-subtle text-danger" style="font-size: 0.8rem; width: auto; border-radius: 999px;">
+                  <option value="warm, inviting, and cozy">✨ Cozy & Welcoming</option>
+                  <option value="luxurious, high-end, and sophisticated">✨ Luxury & Elegant</option>
+                  <option value="vibrant, energetic, and modern">✨ Vibrant & Modern</option>
+                  <option value="scenic, peaceful, and nature-focused">✨ Nature & Peaceful</option>
+                </select>
+                <button type="button" id="btn-ai-generate" class="btn btn-sm btn-outline-danger rounded-pill fw-bold shadow-xs px-3">
+                  <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
+                  <span id="btn-ai-text">Generate with AI</span>
+                </button>
+              </div>
+            </div>
+
+            <textarea id="listing-description" name="listing[description]" rows="5" class="form-control" placeholder="Describe your property or click 'Generate with AI' to write one automatically..." required></textarea>
             <div class="invalid-feedback">Please provide a description.</div>
+
+            <div id="ai-status-msg" class="mt-2 small d-none"></div>
           </div>
 
           <div class="mb-4">
@@ -35,8 +54,8 @@
             </div>
 
             <div class="col-md-6 mb-4">
-              <label class="form-label fw-semibold">Category</label>
-              <select name="listing[category]" class="form-select" required>
+              <label for="listing-category" class="form-label fw-semibold">Category</label>
+              <select id="listing-category" name="listing[category]" class="form-select" required>
                 <option value="" disabled selected>Select an option...</option>
                 <option value="Trending">Trending</option>
                 <option value="Rooms">Rooms</option>
@@ -56,14 +75,14 @@
 
           <div class="row">
             <div class="col-md-6 mb-4">
-              <label class="form-label fw-semibold">Location</label>
-              <input name="listing[location]" type="text" class="form-control" placeholder="e.g., Candolim, Goa" required>
+              <label for="listing-location" class="form-label fw-semibold">Location</label>
+              <input id="listing-location" name="listing[location]" type="text" class="form-control" placeholder="e.g., Candolim, Goa" required>
               <div class="invalid-feedback">Please enter a location.</div>
             </div>
 
             <div class="col-md-6 mb-4">
-              <label class="form-label fw-semibold">Country</label>
-              <input name="listing[country]" type="text" class="form-control" placeholder="e.g., India" required>
+              <label for="listing-country" class="form-label fw-semibold">Country</label>
+              <input id="listing-country" name="listing[country]" type="text" class="form-control" placeholder="e.g., India" required>
               <div class="invalid-feedback">Please enter a country.</div>
             </div>
           </div>
@@ -78,3 +97,84 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const aiBtn = document.getElementById("btn-ai-generate");
+    const aiBtnText = document.getElementById("btn-ai-text");
+    const titleInput = document.getElementById("listing-title");
+    const locationInput = document.getElementById("listing-location");
+    const countryInput = document.getElementById("listing-country");
+    const categorySelect = document.getElementById("listing-category");
+    const vibeSelect = document.getElementById("ai-vibe");
+    const descriptionTextarea = document.getElementById("listing-description");
+    const statusMsg = document.getElementById("ai-status-msg");
+
+    if (aiBtn && descriptionTextarea) {
+      aiBtn.addEventListener("click", async () => {
+        const title = titleInput ? titleInput.value.trim() : "";
+        const location = locationInput ? locationInput.value.trim() : "";
+        const country = countryInput ? countryInput.value.trim() : "";
+        const category = categorySelect ? categorySelect.value : "";
+        const vibe = vibeSelect ? vibeSelect.value : "";
+
+        if (!title || !location) {
+          statusMsg.className = "alert alert-warning py-2 px-3 mt-2 rounded-3 small d-flex align-items-center gap-2";
+          statusMsg.innerHTML = '<i class="fa-solid fa-circle-info text-warning"></i><span>Please fill in <strong>Title</strong> and <strong>Location</strong> first so StayNest AI can tailor the description.</span>';
+          statusMsg.classList.remove("d-none");
+          if (!title && titleInput) {
+            titleInput.focus();
+          } else if (locationInput) {
+            locationInput.focus();
+          }
+          return;
+        }
+
+        aiBtn.disabled = true;
+        const originalContent = aiBtnText.innerHTML;
+        aiBtnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Crafting with AI...';
+
+        statusMsg.className = "alert alert-info py-2 px-3 mt-2 rounded-3 small d-flex align-items-center gap-2";
+        statusMsg.innerHTML = '<i class="fa-solid fa-sparkles fa-spin text-info"></i><span>StayNest AI is crafting an enticing description for your property...</span>';
+        statusMsg.classList.remove("d-none");
+
+        try {
+          const res = await fetch("/api/ai/generate-description", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title,
+              location,
+              country,
+              category: category || "Vacation Home",
+              vibe
+            })
+          });
+
+          const data = await res.json();
+
+          if (data.success && data.description) {
+            descriptionTextarea.value = data.description;
+            descriptionTextarea.classList.remove("is-invalid");
+
+            statusMsg.className = "alert alert-success py-2 px-3 mt-2 rounded-3 small d-flex align-items-center gap-2";
+            statusMsg.innerHTML = '<i class="fa-solid fa-check-circle text-success"></i><span><strong>AI description generated!</strong> You can review, refine, or edit it anytime before publishing.</span>';
+
+            aiBtnText.innerHTML = '<i class="fa-solid fa-rotate me-1"></i> Regenerate with AI';
+          } else {
+            statusMsg.className = "alert alert-danger py-2 px-3 mt-2 rounded-3 small d-flex align-items-center gap-2";
+            statusMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-danger"></i><span>${data.message || "Failed to generate description. Please try again."}</span>`;
+            aiBtnText.innerHTML = originalContent;
+          }
+        } catch (err) {
+          console.error("AI Generation Client Error:", err);
+          statusMsg.className = "alert alert-danger py-2 px-3 mt-2 rounded-3 small d-flex align-items-center gap-2";
+          statusMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-danger"></i><span>Network error connecting to AI assistant. Please try again.</span>';
+          aiBtnText.innerHTML = originalContent;
+        } finally {
+          aiBtn.disabled = false;
+        }
+      });
+    }
+  });
+</script>

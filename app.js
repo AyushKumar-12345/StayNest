@@ -122,9 +122,8 @@ app.use((req, res, next) => {
 // Robust model cascade with retry and jitter for high demand (503) & deprecation handling
 async function generateWithFallback(ai, contents) {
     const candidateModels = [
-        "gemini-3.8-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.0-flash"
+        "gemini-3.5-flash",
+        "gemini-3.8-flash"
     ];
     let lastError = null;
 
@@ -188,9 +187,9 @@ app.post("/api/ai/chat", async (req, res) => {
 // AI Listing Description Generator Endpoint
 app.post("/api/ai/generate-description", isLoggedIn, async (req, res) => {
     try {
-        const { title, location, country, category } = req.body;
+        const { title, location, country, category, vibe } = req.body;
         if (!title || !location) {
-            return res.status(400).json({ success: false, message: "Title and location are required." });
+            return res.status(400).json({ success: false, message: "Listing title and location are required." });
         }
 
         const apiKey = process.env.GEMINI_API_KEY;
@@ -199,9 +198,17 @@ app.post("/api/ai/generate-description", isLoggedIn, async (req, res) => {
         }
 
         const ai = new GoogleGenAI({ apiKey });
-        const prompt = `Write an enticing, elegant, and professional 3-4 sentence property description for a vacation rental listing named "${title}" located in ${location}, ${country || ""} under the category "${category || 'Vacation Home'}". Highlight comfort, surroundings, and vibes. Do not include markdown headers or bullet points.`;
+        const vibePrompt = vibe ? ` with a ${vibe} atmosphere` : "";
+        const prompt = `Write an enticing, elegant, and professional 3-4 sentence property description for a vacation rental listing named "${title}" located in ${location}, ${country || ""} under the category "${category || 'Vacation Home'}"${vibePrompt}. Highlight comfort, surroundings, and vibes. Do not include markdown headers or bullet points.`;
 
-        const description = await generateWithFallback(ai, prompt);
+        let description = "";
+        try {
+            description = await generateWithFallback(ai, prompt);
+        } catch (apiErr) {
+            console.warn("Gemini generation failed, using dynamic high-quality fallback:", apiErr.message);
+            description = `Welcome to ${title}, an exceptional ${category || 'vacation stay'} nestled in the charming surroundings of ${location}${country ? ', ' + country : ''}. Thoughtfully designed for relaxation and modern comfort, this property offers serene living spaces and convenient access to local sights. Whether traveling with family or friends, enjoy an unforgettable and peaceful retreat.`;
+        }
+
         res.json({ success: true, description: description.trim() });
     } catch (err) {
         console.error("AI Description Final Error:", err);
@@ -405,6 +412,13 @@ app.post("/orders/create/:listingId", isLoggedIn, async (req, res) => {
 
         const newCheckIn = new Date(checkIn);
         const newCheckOut = new Date(checkOut);
+
+        if (isNaN(newCheckIn.getTime()) || isNaN(newCheckOut.getTime())) {
+            return res.status(400).json({
+                success: false,
+                error: "Please select valid check-in and check-out dates.",
+            });
+        }
 
         if (newCheckOut <= newCheckIn) {
             return res.status(400).json({

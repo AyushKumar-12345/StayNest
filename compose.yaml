@@ -41,3 +41,4 @@ services:
 volumes:
   mongo-data:
     name: staynest_mongo_data
+

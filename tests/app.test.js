@@ -178,3 +178,4 @@ describe("StayNest Booking Calculation & Date Validation Logic", () => {
         assert.ok(isNaN(invalidDate.getTime()));
     });
 });
+

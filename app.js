@@ -2,8 +2,14 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
 
-const dns = require("node:dns");
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+if (process.env.DOCKER_CONTAINER !== "true") {
+    try {
+        const dns = require("node:dns");
+        dns.setServers(["8.8.8.8", "1.1.1.1"]);
+    } catch (e) {
+        // Ignored
+    }
+}
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -35,20 +41,24 @@ const app = express();
 const upload = multer({ storage });
 
 const PORT = process.env.PORT || 8080;
-const dbUrl = process.env.ATLASDB_URL;
-const sessionSecret = process.env.SECRET;
+const isTestEnv = process.env.NODE_ENV === "test";
+const dbUrl = process.env.ATLASDB_URL || process.env.MONGO_URL || (isTestEnv ? "mongodb://127.0.0.1:27017/staynest_test" : null);
+const sessionSecret = process.env.SECRET || (isTestEnv ? "staynest_test_secret_dev_key" : null);
 
-if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+const razorpayKeyId = process.env.RAZORPAY_KEY_ID || (isTestEnv ? "rzp_test_mock_id" : null);
+const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || (isTestEnv ? "rzp_test_mock_secret" : null);
+
+if (!razorpayKeyId || !razorpayKeySecret) {
     throw new Error("Razorpay credentials missing.");
 }
 
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_id: razorpayKeyId,
+    key_secret: razorpayKeySecret,
 });
 
 if (!dbUrl) {
-    throw new Error("ATLASDB_URL is not defined.");
+    throw new Error("ATLASDB_URL or MONGO_URL is not defined.");
 }
 
 if (!sessionSecret) {
@@ -544,13 +554,17 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render("error.ejs", { message });
 });
 
-// Establish Database Connection and Start Server
-connectDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
+// Establish Database Connection and Start Server when executed directly
+if (require.main === module) {
+    connectDB()
+        .then(() => {
+            app.listen(PORT, () => {
+                console.log(`Server running on http://localhost:${PORT}`);
+            });
+        })
+        .catch((err) => {
+            console.error("Server startup failed:", err);
         });
-    })
-    .catch((err) => {
-        console.error("Server startup failed:", err);
-    });
+}
+
+module.exports = app;

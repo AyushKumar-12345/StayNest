@@ -42,7 +42,7 @@ const upload = multer({ storage });
 
 const PORT = process.env.PORT || 8080;
 const isTestEnv = process.env.NODE_ENV === "test";
-const dbUrl = process.env.ATLASDB_URL || process.env.MONGO_URL || (isTestEnv ? "mongodb://127.0.0.1:27017/staynest_test" : null);
+const dbUrl = process.env.MONGO_URL || process.env.ATLASDB_URL || (isTestEnv ? "mongodb://127.0.0.1:27017/staynest_test" : null);
 const sessionSecret = process.env.SECRET || (isTestEnv ? "staynest_test_secret_dev_key" : null);
 
 const razorpayKeyId = process.env.RAZORPAY_KEY_ID || (isTestEnv ? "rzp_test_mock_id" : null);
@@ -88,28 +88,29 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
-const store = MongoStore.create({
-    mongoUrl: dbUrl,
-    crypto: {
-        secret: sessionSecret,
+const sessionOptions = {
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     },
-    touchAfter: 24 * 60 * 60,
-});
+};
 
-app.use(
-    session({
-        store,
-        secret: sessionSecret,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+if (!isTestEnv) {
+    sessionOptions.store = MongoStore.create({
+        mongoUrl: dbUrl,
+        crypto: {
+            secret: sessionSecret,
         },
-    })
-);
+        touchAfter: 24 * 60 * 60,
+    });
+}
+
+app.use(session(sessionOptions));
 
 app.use(flash());
 

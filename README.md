@@ -74,6 +74,8 @@ flowchart TD
     InvoiceGen -->|PDF Receipt Download| Client
 ```
 
+> 💡 *A visual request lifecycle map is also available in [`architecture.svg`](./architecture.svg).*
+
 ---
 
 ## ✨ Key Features
